@@ -21,18 +21,17 @@ TestCase subclass: #CustomerBookTest
 	poolDictionaries: ''
 	category: 'CodigoRepetido-Ejercicio'!
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'PG 5/1/2022 22:11:37'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'PG 5/2/2022 13:57:40'!
 test01AddingCustomerShouldNotTakeMoreThan50Milliseconds
 
 	| customerBook customerBookModification |
 	
 	customerBook := CustomerBook new.
 	customerBookModification := [customerBook addCustomerNamed: 'John Lennon'].
+	
+	self assertIf: customerBookModification takesLessTimeThan: 50.! !
 
-	self calculateTimeToExecute: customerBookModification on: 50.
-! !
-
-!CustomerBookTest methodsFor: 'testing' stamp: 'PG 5/1/2022 22:11:40'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'PG 5/2/2022 13:58:53'!
 test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 
 	| customerBook paulMcCartney customerBookModification |
@@ -41,8 +40,9 @@ test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 	customerBook := self initializeCustomerBookWithActiveCustomerNamed: paulMcCartney.	
 	
 	customerBookModification := [customerBook removeCustomerNamed: paulMcCartney.].
-		
-	self calculateTimeToExecute: customerBookModification on: 100.
+	
+	self assertIf: customerBookModification takesLessTimeThan: 100.
+
 ! !
 
 !CustomerBookTest methodsFor: 'testing' stamp: 'PG 5/1/2022 22:13:52'!
@@ -82,7 +82,7 @@ test04CanNotRemoveAnInvalidCustomer
 	self verifyIf: customerBookModification triggers: error andVerifies: assertionsForCustomerBook.
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'PG 5/1/2022 22:14:46'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'PG 5/2/2022 14:11:36'!
 test05SuspendingACustomerShouldNotRemoveItFromCustomerBook
 
 	| customerBook paulMcCartney assertionForCustomerIncludedInBook |
@@ -92,10 +92,9 @@ test05SuspendingACustomerShouldNotRemoveItFromCustomerBook
 	
 	assertionForCustomerIncludedInBook := [self assert: (customerBook includesCustomerNamed: paulMcCartney)].
 	
-	self verifyIf: customerBook has: 0 amountOfActiveCustomersAnd: 1 amountOfSuspendedCustomersAnd: 1 totalCustomersAndCheckConditionFor: assertionForCustomerIncludedInBook.
-! !
+	self assertIf: customerBook has: 0 amountOfActiveCustomersAnd: 1 amountOfSuspendedCustomersAnd: 1 totalCustomersAndCheckConditionFor: assertionForCustomerIncludedInBook.! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'PG 5/1/2022 22:15:05'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'PG 5/2/2022 14:12:14'!
 test06RemovingASuspendedCustomerShouldRemoveItFromCustomerBook
 
 	| customerBook paulMcCartney assertionForCustomerIncludedInBook |
@@ -107,7 +106,7 @@ test06RemovingASuspendedCustomerShouldRemoveItFromCustomerBook
 	
 	assertionForCustomerIncludedInBook := [self deny: (customerBook includesCustomerNamed: paulMcCartney)].
 	
-	self verifyIf:customerBook has:0 amountOfActiveCustomersAnd:0 amountOfSuspendedCustomersAnd:0 totalCustomersAndCheckConditionFor: assertionForCustomerIncludedInBook.
+	self assertIf: customerBook has: 0 amountOfActiveCustomersAnd: 0 amountOfSuspendedCustomersAnd: 0 totalCustomersAndCheckConditionFor: assertionForCustomerIncludedInBook.
 ! !
 
 !CustomerBookTest methodsFor: 'testing' stamp: 'PG 5/1/2022 22:19:00'!
@@ -137,20 +136,50 @@ test08CanNotSuspendAnAlreadySuspendedCustomer
 ! !
 
 
-!CustomerBookTest methodsFor: 'helpers' stamp: 'PG 5/1/2022 22:11:28'!
-calculateTimeToExecute: anAction on: milliseconds
+!CustomerBookTest methodsFor: 'helpers' stamp: 'PG 5/2/2022 14:12:26'!
+assertIf: customerBook has: aNumberOfActiveCustomers amountOfActiveCustomersAnd: aNumberOfSuspendedCustomers amountOfSuspendedCustomersAnd: aNumberOfCustomers
+	"Verifies that a given CustomerBook has the supposed amount of active, suspended and total customers"
+
+	self assert: aNumberOfActiveCustomers  equals: customerBook numberOfActiveCustomers.
+	self assert: aNumberOfSuspendedCustomers equals: customerBook numberOfSuspendedCustomers.
+	self assert: aNumberOfCustomers equals: customerBook numberOfCustomers.
+
+! !
+
+!CustomerBookTest methodsFor: 'helpers' stamp: 'PG 5/2/2022 14:12:30'!
+assertIf: customerBook has: aNumberOfActiveCustomers amountOfActiveCustomersAnd: aNumberOfSuspendedCustomers amountOfSuspendedCustomersAnd: aNumberOfCustomers totalCustomersAndCheckConditionFor: assertionForCustomerIncludedInBook
+	"Verifies that a given CustomerBook has the supposed amount of active, suspended and total customers. Also executes a given action that should verify if the customerBook includes a customer"
+
+	self assertIf: customerBook has: aNumberOfActiveCustomers amountOfActiveCustomersAnd: aNumberOfSuspendedCustomers amountOfSuspendedCustomersAnd: aNumberOfCustomers.
+	assertionForCustomerIncludedInBook value.
+! !
+
+!CustomerBookTest methodsFor: 'helpers' stamp: 'PG 5/2/2022 14:00:18'!
+assertIf: action takesLessTimeThan: milliseconds
+	"Asserts if executing an action takes less time than a given time in milliseconds"
+
+	| time |
+	
+	time := self calculateTimeToExecute: action.
+	self assert: (time) < (milliseconds * millisecond).! !
+
+!CustomerBookTest methodsFor: 'helpers' stamp: 'PG 5/2/2022 13:59:41'!
+calculateTimeToExecute: anAction
+	"Calculates how much time it takes to execute an action. Returns that number in milliseconds."
 
 	| millisecondsBeforeRunning millisecondsAfterRunning |
 	
 	millisecondsBeforeRunning := Time millisecondClockValue * millisecond.
 	anAction value.
 	millisecondsAfterRunning := Time millisecondClockValue * millisecond.
+	
+	^(millisecondsAfterRunning-millisecondsBeforeRunning).
 
-	self assert: (millisecondsAfterRunning-millisecondsBeforeRunning) < (milliseconds * millisecond).
 ! !
 
-!CustomerBookTest methodsFor: 'helpers' stamp: 'PG 5/1/2022 18:57:55'!
+!CustomerBookTest methodsFor: 'helpers' stamp: 'PG 5/2/2022 14:00:54'!
 initializeCustomerBookWithActiveCustomerNamed: aCustomer
+	"Creates new CustomerBook with a given customer as an active customer"
 	
 	| customerBook |
 			
@@ -159,8 +188,9 @@ initializeCustomerBookWithActiveCustomerNamed: aCustomer
 	
 	^customerBook.! !
 
-!CustomerBookTest methodsFor: 'helpers' stamp: 'PG 5/1/2022 19:42:58'!
+!CustomerBookTest methodsFor: 'helpers' stamp: 'PG 5/2/2022 14:01:20'!
 initializeCustomerBookWithSuspendedCustomerNamed:aCustomer
+	"Creates new CustomerBook with a given customer and suspends them"
 
 	| customerBook|
 	
@@ -170,8 +200,9 @@ initializeCustomerBookWithSuspendedCustomerNamed:aCustomer
 	^customerBook.
 ! !
 
-!CustomerBookTest methodsFor: 'helpers' stamp: 'PG 5/1/2022 22:18:29'!
+!CustomerBookTest methodsFor: 'helpers' stamp: 'PG 5/2/2022 14:03:24'!
 tryToExecuteAn: action onACustomerBookNamed: aCustomerBook forACustomerNamed: aCustomer
+	"Tries to execute an action that will trigger the 'CantSuspend' error and then asserts that the CustomerBook still includes a given customer"
 	
 	| error assertions |
 	
@@ -184,17 +215,9 @@ tryToExecuteAn: action onACustomerBookNamed: aCustomerBook forACustomerNamed: aC
 	self verifyIf: action triggers: error andVerifies: assertions.
 ! !
 
-!CustomerBookTest methodsFor: 'helpers' stamp: 'PG 5/1/2022 21:21:37'!
-verifyIf: customerBook has: aNumberOfActiveCustomers amountOfActiveCustomersAnd: aNumberOfSuspendedCustomers amountOfSuspendedCustomersAnd: aNumberOfCustomers totalCustomersAndCheckConditionFor: action
-
-	self assert: aNumberOfActiveCustomers  equals: customerBook numberOfActiveCustomers.
-	self assert: aNumberOfSuspendedCustomers equals: customerBook numberOfSuspendedCustomers.
-	self assert: aNumberOfCustomers equals: customerBook numberOfCustomers.
-	action value.
-! !
-
-!CustomerBookTest methodsFor: 'helpers' stamp: 'PG 5/1/2022 19:32:14'!
+!CustomerBookTest methodsFor: 'helpers' stamp: 'PG 5/2/2022 14:04:40'!
 verifyIf: action triggers: error andVerifies: assertions
+	"Verifies that executing an action will trigger a given error and then do some assertions"
 
 	[ action value.
 	self fail ]
