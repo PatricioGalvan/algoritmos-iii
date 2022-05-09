@@ -10,15 +10,16 @@ test01isZeroReturnsTrueWhenAskToZero
 
 	self assert: zero isZero! !
 
-!NumeroTest methodsFor: 'tests' stamp: 'LL 9/13/2020 16:17:58'!
+!NumeroTest methodsFor: 'tests' stamp: 'PG 5/8/2022 18:08:59'!
 test02isZeroReturnsFalseWhenAskToOthersButZero
 
 	self deny: one isZero! !
 
-!NumeroTest methodsFor: 'tests' stamp: 'HernanWilkinson 5/7/2016 20:13'!
+!NumeroTest methodsFor: 'tests' stamp: 'PG 5/9/2022 12:39:50'!
 test03isOneReturnsTrueWhenAskToOne
 
-	self assert: one isOne! !
+	self assert: one isOne
+! !
 
 !NumeroTest methodsFor: 'tests' stamp: 'HernanWilkinson 5/7/2016 20:13'!
 test04isOneReturnsFalseWhenAskToOtherThanOne
@@ -200,7 +201,7 @@ test31SubstractingFraccionesCanReturnAnEntero
 	
 	self assert: one equals: threeHalfs - oneHalf! !
 
-!NumeroTest methodsFor: 'tests' stamp: 'JS 5/5/2022 03:47:44'!
+!NumeroTest methodsFor: 'tests' stamp: 'PG 5/9/2022 12:40:57'!
 test32SubstractingSameEnterosReturnsZero
 
 	self assert: zero equals: one - one! !
@@ -229,7 +230,7 @@ test36FibonacciOneIsOne
 
 	self assert: one equals: one fibonacci! !
 
-!NumeroTest methodsFor: 'tests' stamp: 'JS 5/5/2022 03:52:24'!
+!NumeroTest methodsFor: 'tests' stamp: 'PG 5/8/2022 18:04:09'!
 test37FibonacciEnteroReturnsAddingPreviousTwoFibonacciEnteros
 
 	self assert: five equals: four fibonacci.
@@ -369,7 +370,7 @@ Numero subclass: #Entero
 	^aMultiplicand beMultipliedToAnEntero: self.
 ! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'PG 5/8/2022 11:54:34'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'PG 5/8/2022 18:47:19'!
 + anAdder 	
 
 	^anAdder beAddedToAnEntero: self.
@@ -387,19 +388,10 @@ Numero subclass: #Entero
 	^aDivisor divideAnEntero: self.
 ! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'PG 5/8/2022 12:30:59'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'PG 5/8/2022 18:53:37'!
 fibonacci
 
-	| one two |
-	
-	one := Entero with: 1.
-	two := Entero with: 2.
-	
-	self isNegative ifTrue: [self error: Entero negativeFibonacciErrorDescription ].	
-	(self isZero or: [self isOne]) ifTrue: [^one].
-	
-	^ (self - one) fibonacci + (self - two) fibonacci
-		
+	self subclassResponsibility .
 ! !
 
 
@@ -439,15 +431,15 @@ isNegative
 	
 	^value < 0! !
 
-!Entero methodsFor: 'testing' stamp: 'HernanWilkinson 5/7/2016 20:14'!
+!Entero methodsFor: 'testing' stamp: 'PG 5/9/2022 12:59:25'!
 isOne
 	
-	^value = 1! !
+	^false! !
 
-!Entero methodsFor: 'testing' stamp: 'HernanWilkinson 5/7/2016 20:12'!
+!Entero methodsFor: 'testing' stamp: 'PG 5/9/2022 13:01:20'!
 isZero
 	
-	^value = 0! !
+	^false! !
 
 
 !Entero methodsFor: 'arithmetic operations - private' stamp: 'HernanWilkinson 5/7/2016 21:55'!
@@ -455,8 +447,9 @@ isZero
 	
 	^self class with: value // aDivisor integerValue! !
 
-!Entero methodsFor: 'arithmetic operations - private' stamp: 'PG 5/7/2022 16:42:33'!
-beAddedToAFraccion: anAugend 
+!Entero methodsFor: 'arithmetic operations - private' stamp: 'PG 5/9/2022 13:23:49'!
+beAddedToAFraccion: anAugend
+	"Returns result of adding an Entero to a Fraccion"
 
 	| newNumerator newDenominator |
 	
@@ -466,32 +459,31 @@ beAddedToAFraccion: anAugend
 	^newNumerator / newDenominator.
 ! !
 
-!Entero methodsFor: 'arithmetic operations - private' stamp: 'PG 5/8/2022 11:56:07'!
+!Entero methodsFor: 'arithmetic operations - private' stamp: 'PG 5/9/2022 13:23:46'!
 beAddedToAnEntero: anAugend 
+	"Returns result of adding an Entero to another Entero"
 
-	^self class with: anAugend integerValue + self integerValue.
+	^Entero with: anAugend integerValue + self integerValue.
 ! !
 
-!Entero methodsFor: 'arithmetic operations - private' stamp: 'PG 5/8/2022 11:56:15'!
+!Entero methodsFor: 'arithmetic operations - private' stamp: 'PG 5/9/2022 13:24:16'!
 beMultipliedToAFraccion: aMultiplier
+	"Returns result of multiplying an Entero to a Fraccion"
 
-	| newNumerator newDenominator |
-	
-	newNumerator := self * aMultiplier numerator.
-	newDenominator := aMultiplier denominator.
-	
-	^newNumerator / newDenominator .
+	^(self * aMultiplier numerator) / aMultiplier denominator .
 ! !
 
-!Entero methodsFor: 'arithmetic operations - private' stamp: 'PG 5/7/2022 16:52:30'!
+!Entero methodsFor: 'arithmetic operations - private' stamp: 'PG 5/9/2022 13:23:37'!
 beMultipliedToAnEntero: aMultiplier
+	"Returns result of multiplying an Entero to another Entero"
 
-	^self class with: aMultiplier integerValue * self integerValue.
+	^Entero with: aMultiplier integerValue * self integerValue.
 	
 ! !
 
-!Entero methodsFor: 'arithmetic operations - private' stamp: 'PG 5/8/2022 11:56:25'!
+!Entero methodsFor: 'arithmetic operations - private' stamp: 'PG 5/9/2022 13:23:34'!
 beSubstractedFromAFraccion: aMinuend
+	"Returns result of substracting an Entero from a Fraccion"
 
 	| newNumerator newDenominator|
 	
@@ -501,25 +493,27 @@ beSubstractedFromAFraccion: aMinuend
 	^ newNumerator / newDenominator.
 ! !
 
-!Entero methodsFor: 'arithmetic operations - private' stamp: 'PG 5/8/2022 11:56:28'!
+!Entero methodsFor: 'arithmetic operations - private' stamp: 'PG 5/9/2022 13:23:30'!
 beSubstractedFromAnEntero: aMinuend
+	"Returns result of substracting an Entero from another Entero"
 	
-	^ self class with: aMinuend integerValue - self integerValue.
+	^Entero with: aMinuend integerValue - self integerValue.
 ! !
 
-!Entero methodsFor: 'arithmetic operations - private' stamp: 'PG 5/8/2022 11:56:36'!
+!Entero methodsFor: 'arithmetic operations - private' stamp: 'PG 5/9/2022 13:35:59'!
 divideAFraccion: aDividend
+	"Returns result of dividing a Fraccion by an Entero"
 
-	^(aDividend numerator) / (aDividend denominator * self).
-! !
+	^(aDividend numerator) / (aDividend denominator * self).! !
 
-!Entero methodsFor: 'arithmetic operations - private' stamp: 'PG 5/8/2022 11:56:39'!
+!Entero methodsFor: 'arithmetic operations - private' stamp: 'PG 5/9/2022 13:36:03'!
 divideAnEntero: aDividend
+	"Returns result of dividing an Entero by an Entero"
 
 	^Fraccion with: aDividend over: self.
 ! !
 
-!Entero methodsFor: 'arithmetic operations - private' stamp: 'HernanWilkinson 5/7/2016 21:00'!
+!Entero methodsFor: 'arithmetic operations - private' stamp: 'PG 5/8/2022 17:41:21'!
 greatestCommonDivisorWith: anEntero 
 	
 	^self class with: (value gcd: anEntero integerValue)! !
@@ -534,13 +528,167 @@ Entero class
 negativeFibonacciErrorDescription
 	^ ' Fibonacci no está definido aquí para Enteros Negativos'! !
 
-!Entero class methodsFor: 'instance creation' stamp: 'JS 5/5/2022 03:55:37'!
-with: aValue 
-	
+!Entero class methodsFor: 'instance creation' stamp: 'PG 5/8/2022 20:06:16'!
+with: aValue 	
 	"Esta verificacion esta puesta por si se equivocan y quieren crear un Entero pasando otra cosa que un Integer - Hernan"
-	aValue isInteger ifFalse: [  self error: 'aValue debe ser anInteger' ].
 	
-	^self new initializeWith: aValue! !
+	| enteroSubclass |
+	
+	aValue isInteger ifFalse: [ self error: 'aValue debe ser anInteger' ].	
+			
+	enteroSubclass := (Entero subclasses) detect: [:subclass | subclass includes: aValue].
+
+	^enteroSubclass new initializeWith: aValue.
+! !
+
+
+!classDefinition: #Cero category: 'Numeros-Parte2-Ejercicio'!
+Entero subclass: #Cero
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numeros-Parte2-Ejercicio'!
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'PG 5/9/2022 13:28:48'!
+* aMultiplicand
+	"Returns 0 when trying to multiply a multiplicand to 0"
+
+	^0.
+! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'PG 5/9/2022 13:28:30'!
++ anAdder
+	"Returns the adder when trying to add to 0"
+
+	^anAdder.
+! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'PG 5/9/2022 13:25:33'!
+divideAFraccion: aDividend
+	"Returns result of dividing a Fraccion by 0"
+
+	self error: self class canNotDivideByZeroErrorDescription
+! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'PG 5/9/2022 13:25:45'!
+divideAnEntero: aDividend
+	"Returns result of dividing an Entero by 0"
+	
+	self error: self class canNotDivideByZeroErrorDescription
+! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'PG 5/8/2022 16:39:33'!
+fibonacci
+
+	^ Entero with: 1.
+	
+	! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'PG 5/9/2022 13:29:24'!
+isZero	
+	
+	^true! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Cero class' category: 'Numeros-Parte2-Ejercicio'!
+Cero class
+	instanceVariableNames: ''!
+
+!Cero class methodsFor: 'as yet unclassified' stamp: 'PG 5/8/2022 18:34:13'!
+includes: aValue
+
+	^aValue = 0! !
+
+
+!classDefinition: #MayorAUno category: 'Numeros-Parte2-Ejercicio'!
+Entero subclass: #MayorAUno
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numeros-Parte2-Ejercicio'!
+
+!MayorAUno methodsFor: 'as yet unclassified' stamp: 'PG 5/8/2022 17:23:07'!
+fibonacci
+
+	| one two |
+	
+	one := Entero with: 1.
+	two := Entero with: 2.
+	
+	^(self - one) fibonacci + (self - two) fibonacci.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'MayorAUno class' category: 'Numeros-Parte2-Ejercicio'!
+MayorAUno class
+	instanceVariableNames: ''!
+
+!MayorAUno class methodsFor: 'as yet unclassified' stamp: 'PG 5/8/2022 18:34:10'!
+includes: aValue
+
+	^aValue > 1! !
+
+
+!classDefinition: #Negativo category: 'Numeros-Parte2-Ejercicio'!
+Entero subclass: #Negativo
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numeros-Parte2-Ejercicio'!
+
+!Negativo methodsFor: 'as yet unclassified' stamp: 'PG 5/8/2022 14:43:59'!
+fibonacci
+
+	self error: Entero negativeFibonacciErrorDescription.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Negativo class' category: 'Numeros-Parte2-Ejercicio'!
+Negativo class
+	instanceVariableNames: ''!
+
+!Negativo class methodsFor: 'as yet unclassified' stamp: 'PG 5/8/2022 18:35:18'!
+includes: aValue
+	^aValue < 0.! !
+
+
+!classDefinition: #Uno category: 'Numeros-Parte2-Ejercicio'!
+Entero subclass: #Uno
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numeros-Parte2-Ejercicio'!
+
+!Uno methodsFor: 'as yet unclassified' stamp: 'PG 5/9/2022 13:28:10'!
+* aMultiplicand
+	"Returns the multiplicand when trying to multiply to the neutral number"
+
+	^aMultiplicand.
+! !
+
+!Uno methodsFor: 'as yet unclassified' stamp: 'PG 5/8/2022 15:17:31'!
+fibonacci
+
+	^Entero with: 1.
+	! !
+
+!Uno methodsFor: 'as yet unclassified' stamp: 'PG 5/9/2022 12:59:35'!
+isOne
+
+	^true
+! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Uno class' category: 'Numeros-Parte2-Ejercicio'!
+Uno class
+	instanceVariableNames: ''!
+
+!Uno class methodsFor: 'as yet unclassified' stamp: 'PG 5/8/2022 18:34:15'!
+includes: aValue
+
+	^aValue = 1! !
 
 
 !classDefinition: #Fraccion category: 'Numeros-Parte2-Ejercicio'!
@@ -633,8 +781,9 @@ printOn: aStream
 		print: denominator ! !
 
 
-!Fraccion methodsFor: 'arithmetic operations - private' stamp: 'PG 5/7/2022 15:51:53'!
-beAddedToAFraccion: anAugend 
+!Fraccion methodsFor: 'arithmetic operations - private' stamp: 'PG 5/9/2022 13:31:53'!
+beAddedToAFraccion: anAugend
+	"Returns result of adding a Fraccion to another Fraccion"
 
 	| newNumerator newDenominator |
 	
@@ -644,17 +793,15 @@ beAddedToAFraccion: anAugend
 	^newNumerator / newDenominator 
 ! !
 
-!Fraccion methodsFor: 'arithmetic operations - private' stamp: 'PG 5/5/2022 20:55:29'!
+!Fraccion methodsFor: 'arithmetic operations - private' stamp: 'PG 5/9/2022 13:38:05'!
 beAddedToAnEntero: anAugend 
+	"Returns result of adding a Fraccion to an Entero"
 
-	| newNumerator newDenominator |
+	^(self denominator * anAugend) + self numerator / self denominator 	.! !
 
-	newNumerator := (denominator * anAugend) + numerator.
-	newDenominator := denominator.
-	^newNumerator / newDenominator 	.! !
-
-!Fraccion methodsFor: 'arithmetic operations - private' stamp: 'PG 5/8/2022 11:57:07'!
+!Fraccion methodsFor: 'arithmetic operations - private' stamp: 'PG 5/9/2022 13:32:24'!
 beMultipliedToAFraccion: aMultiplier
+	"Returns result of multiplying a Fraccion to another Fraccion"
 
 	| newNumerator newDenominator |
 	
@@ -664,21 +811,18 @@ beMultipliedToAFraccion: aMultiplier
 	^newNumerator / newDenominator .
 ! !
 
-!Fraccion methodsFor: 'arithmetic operations - private' stamp: 'PG 5/8/2022 11:57:20'!
+!Fraccion methodsFor: 'arithmetic operations - private' stamp: 'PG 5/9/2022 13:37:22'!
 beMultipliedToAnEntero: aMultiplier
+	"Returns result of multiplying an Fraccion to an Entero"
 
-	| newNumerator newDenominator |
-	
-	newNumerator := self numerator * aMultiplier.
-	newDenominator := self denominator.
-	
-	^newNumerator / newDenominator .
+	^self numerator * aMultiplier / self denominator .
 ! !
 
-!Fraccion methodsFor: 'arithmetic operations - private' stamp: 'PG 5/8/2022 11:57:25'!
+!Fraccion methodsFor: 'arithmetic operations - private' stamp: 'PG 5/9/2022 13:37:37'!
 beSubstractedFromAFraccion: aMinuend
+	"Returns result of substracting a Fraccion from a Fraccion"
 
-	| newNumerator newDenominator|
+	| newNumerator newDenominator |
 	
 	newNumerator := (aMinuend numerator * self denominator) - (aMinuend denominator * self numerator).
 	newDenominator := aMinuend denominator * self denominator.
@@ -686,8 +830,9 @@ beSubstractedFromAFraccion: aMinuend
 	^ newNumerator / newDenominator.
 ! !
 
-!Fraccion methodsFor: 'arithmetic operations - private' stamp: 'PG 5/8/2022 11:57:32'!
+!Fraccion methodsFor: 'arithmetic operations - private' stamp: 'PG 5/9/2022 13:33:35'!
 beSubstractedFromAnEntero: aMinuend
+	"Returns result of substracting a Fraccion from an Entero"
 
 	| newNumerator newDenominator|
 	
@@ -697,14 +842,16 @@ beSubstractedFromAnEntero: aMinuend
 	^ newNumerator / newDenominator.
 ! !
 
-!Fraccion methodsFor: 'arithmetic operations - private' stamp: 'PG 5/8/2022 11:57:42'!
+!Fraccion methodsFor: 'arithmetic operations - private' stamp: 'PG 5/9/2022 13:36:09'!
 divideAFraccion: aDividend
+	"Returns result of dividing a Fraccion by a Fraccion"
 
 	^(aDividend numerator * self denominator) / (aDividend denominator * self numerator).
 ! !
 
-!Fraccion methodsFor: 'arithmetic operations - private' stamp: 'PG 5/8/2022 11:57:48'!
+!Fraccion methodsFor: 'arithmetic operations - private' stamp: 'PG 5/9/2022 13:36:14'!
 divideAnEntero: aDividend
+	"Returns result of dividing an Entero by a Fraccion"
 
 	^(aDividend * self denominator) / (self numerator).
 ! !
@@ -715,13 +862,10 @@ divideAnEntero: aDividend
 Fraccion class
 	instanceVariableNames: ''!
 
-!Fraccion class methodsFor: 'intance creation' stamp: 'NR 9/23/2018 23:45:19'!
+!Fraccion class methodsFor: 'intance creation' stamp: 'PG 5/9/2022 12:55:52'!
 with: aDividend over: aDivisor
 
 	| greatestCommonDivisor numerator denominator |
-	
-	aDivisor isZero ifTrue: [ self error: self canNotDivideByZeroErrorDescription ].
-	aDividend isZero ifTrue: [ ^aDividend ].
 	
 	aDivisor isNegative ifTrue:[ ^aDividend negated / aDivisor negated].
 	
