@@ -297,11 +297,11 @@ removeLast
 	^contents removeLast.
 ! !
 
-!OOStack methodsFor: 'helpers' stamp: 'PG 5/16/2022 17:59:44'!
+!OOStack methodsFor: 'helpers' stamp: 'PG 5/16/2022 18:18:23'!
 setState
 	"Sets state for the stack, either empty or not empty"
 
-	state := OOStackState with: self size.
+	state := OOStackState withSize: self size.
 
 
 ! !
@@ -399,12 +399,12 @@ popFrom: aStack
 OOStackState class
 	instanceVariableNames: ''!
 
-!OOStackState class methodsFor: 'as yet unclassified' stamp: 'PG 5/15/2022 16:54:34'!
-with: aValue
+!OOStackState class methodsFor: 'as yet unclassified' stamp: 'PG 5/16/2022 18:17:45'!
+withSize: aSize
 
 	| stackStateSubclass |
 	
-	stackStateSubclass := (OOStackState subclasses) detect: [:subclass | subclass includes: aValue].
+	stackStateSubclass := (OOStackState subclasses) detect: [:subclass | subclass validates: aSize].
 	
 	^stackStateSubclass new.! !
 
@@ -441,8 +441,8 @@ popFrom: aStack
 OOStackEmpty class
 	instanceVariableNames: ''!
 
-!OOStackEmpty class methodsFor: 'as yet unclassified' stamp: 'PG 5/15/2022 16:56:38'!
-includes: aValue
+!OOStackEmpty class methodsFor: 'as yet unclassified' stamp: 'PG 5/16/2022 18:17:51'!
+validates: aValue
 
 	^aValue = 0.! !
 
@@ -481,8 +481,8 @@ popFrom: aStack
 OOStackNotEmpty class
 	instanceVariableNames: ''!
 
-!OOStackNotEmpty class methodsFor: 'as yet unclassified' stamp: 'PG 5/15/2022 16:56:48'!
-includes: aValue
+!OOStackNotEmpty class methodsFor: 'as yet unclassified' stamp: 'PG 5/16/2022 18:17:58'!
+validates: aValue
 
 	^aValue > 0.! !
 
