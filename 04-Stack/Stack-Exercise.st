@@ -505,12 +505,13 @@ validatePrefix
 Prefix class
 	instanceVariableNames: ''!
 
-!Prefix class methodsFor: 'as yet unclassified' stamp: 'PG 5/16/2022 12:41:37'!
+!Prefix class methodsFor: 'as yet unclassified' stamp: 'PG 5/16/2022 18:33:05'!
 with: aPrefix
 
 	| prefixSubclass prefixSubclasses |
 	
-	prefixSubclasses := {PrefixNotString. PrefixWithSpaces. PrefixBlank. PrefixString } asOrderedCollection.
+	"Necesitamos validar las condiciones en un orden en especifico. Si se revisara primero para PrefixWithSpaces, cuando aPrefix sea por ej un Smallinteger nos daria error ya que no tiene un metodo includesSubstring"
+	prefixSubclasses := {PrefixNotString. PrefixWithSpaces. PrefixBlank. PrefixValidString } asOrderedCollection.
 
 	prefixSubclass := (prefixSubclasses) detect: [:subclass | subclass validates: aPrefix].
 
@@ -569,14 +570,14 @@ validates: aPrefix
 	^((aPrefix isKindOf: String) not).! !
 
 
-!classDefinition: #PrefixString category: 'Stack-Exercise'!
-Prefix subclass: #PrefixString
+!classDefinition: #PrefixValidString category: 'Stack-Exercise'!
+Prefix subclass: #PrefixValidString
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!PrefixString methodsFor: 'validation' stamp: 'PG 5/16/2022 18:06:15'!
+!PrefixValidString methodsFor: 'validation' stamp: 'PG 5/16/2022 18:06:15'!
 validatePrefix
 	"Returns something that is not an error"
 	
@@ -584,11 +585,11 @@ validatePrefix
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'PrefixString class' category: 'Stack-Exercise'!
-PrefixString class
+!classDefinition: 'PrefixValidString class' category: 'Stack-Exercise'!
+PrefixValidString class
 	instanceVariableNames: ''!
 
-!PrefixString class methodsFor: 'as yet unclassified' stamp: 'PG 5/15/2022 22:36:51'!
+!PrefixValidString class methodsFor: 'as yet unclassified' stamp: 'PG 5/15/2022 22:36:51'!
 validates: aPrefix
 
 	^aPrefix isKindOf: String.! !
