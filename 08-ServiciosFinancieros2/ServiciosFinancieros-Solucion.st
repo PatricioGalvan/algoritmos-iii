@@ -5,7 +5,7 @@ TestCase subclass: #AccountSummaryTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 18:22:48'!
+!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:26:07'!
 test01
 	"Summary para una cuenta sin balance"
 	
@@ -16,10 +16,10 @@ test01
 	
 	summaryReport := {'Balance = 0 * pesos'} asOrderedCollection.
 		
-	self assert: summary report equals: summaryReport.
+	self assert: (summary report) equals: summaryReport.
 	! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 18:16:09'!
+!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:26:45'!
 test02
 	"Summary para una cuenta con balance"
 	
@@ -32,7 +32,7 @@ test02
 	
 	summary := AccountSummary for: account.	
 	
-	self assert: summary report equals: summaryReport.
+	self assert: (summary report) equals: summaryReport.
 ! !
 
 !AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 18:18:14'!
@@ -905,26 +905,75 @@ isComposedBy: anAccount
 	^self = anAccount ! !
 
 
+!classDefinition: #AccountReport category: 'ServiciosFinancieros-Solucion'!
+Object subclass: #AccountReport
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!AccountReport methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:49:19'!
+useDepositFor: aTransaction
+
+	self subclassResponsibility.
+! !
+
+!AccountReport methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:49:59'!
+useTransferDepositLegFor: aTransaction
+
+	self subclassResponsibility.! !
+
+!AccountReport methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:50:19'!
+useTransferWithdrawLegFor: aTransaction
+
+	self subclassResponsibility.! !
+
+!AccountReport methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:50:37'!
+useWithdrawFor: aTransaction
+
+	self subclassResponsibility.! !
+
+
 !classDefinition: #AccountSummary category: 'ServiciosFinancieros-Solucion'!
-Object subclass: #AccountSummary
+AccountReport subclass: #AccountSummary
 	instanceVariableNames: 'accountSummary'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!AccountSummary methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 19:44:03'!
+!AccountSummary methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:28:21'!
 initializeFor: anAccount
 
 	accountSummary := OrderedCollection new.
-	accountSummary add: 'Balance = ', (anAccount balance)asString.
 	
-	anAccount transactions do: [ :aTransaction | accountSummary add: aTransaction asString.].
-! !
+	accountSummary add: 'Balance = ', (anAccount balance)asString.
+	anAccount transactions do: [ :aTransaction | accountSummary add: (aTransaction usedForReport: self)].
+	! !
 
 !AccountSummary methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 17:56:45'!
 report
 
 	^accountSummary.! !
+
+!AccountSummary methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:31:43'!
+useDepositFor: aTransaction
+
+	^'Deposito por ', (aTransaction value)asString.! !
+
+!AccountSummary methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:32:02'!
+useTransferDepositLegFor: aTransaction
+
+	^'Entrada por transferencia de ', (aTransaction value)asString.! !
+
+!AccountSummary methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:32:19'!
+useTransferWithdrawLegFor: aTransaction
+
+	^'Salida por transferencia de ', (aTransaction value)asString.! !
+
+!AccountSummary methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:32:33'!
+useWithdrawFor: aTransaction
+
+	^'Retiro por ', (aTransaction value)asString.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -942,6 +991,62 @@ for: anAccount
 	^summary initializeFor: anAccount.! !
 
 
+!classDefinition: #TransferNet category: 'ServiciosFinancieros-Solucion'!
+AccountReport subclass: #TransferNet
+	instanceVariableNames: 'netForAccount'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!TransferNet methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:56:30'!
+initializeFor: anAccount
+
+	netForAccount := 0 * peso.
+	
+	anAccount transactions do: [ :aTransaction | 
+		netForAccount := netForAccount + (aTransaction usedForReport: self).
+	].
+! !
+
+!TransferNet methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 19:02:07'!
+net
+
+	^netForAccount value.! !
+
+!TransferNet methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:55:47'!
+useDepositFor: aTransaction
+
+	^0*peso.! !
+
+!TransferNet methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:42:38'!
+useTransferDepositLegFor: aTransaction
+
+	^aTransaction value.! !
+
+!TransferNet methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:42:47'!
+useTransferWithdrawLegFor: aTransaction
+
+	^aTransaction value negated.! !
+
+!TransferNet methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:44:52'!
+useWithdrawFor: aTransaction
+
+	^0 * peso.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TransferNet class' category: 'ServiciosFinancieros-Solucion'!
+TransferNet class
+	instanceVariableNames: ''!
+
+!TransferNet class methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 19:00:06'!
+for: anAccount
+
+	^self new initializeFor: anAccount.
+	
+	! !
+
+
 !classDefinition: #AccountTransaction category: 'ServiciosFinancieros-Solucion'!
 Object subclass: #AccountTransaction
 	instanceVariableNames: ''
@@ -953,6 +1058,11 @@ Object subclass: #AccountTransaction
 asString 
 
 	self subclassResponsibility ! !
+
+!AccountTransaction methodsFor: 'value' stamp: 'PG 6/13/2022 20:28:21'!
+usedForReport: aReport
+
+	self subclassResponsibility.! !
 
 !AccountTransaction methodsFor: 'value' stamp: 'HernanWilkinson 9/12/2011 12:25'!
 value 
@@ -983,6 +1093,11 @@ initializeFor: aValue
 
 	value := aValue ! !
 
+
+!Deposit methodsFor: 'value' stamp: 'PG 6/13/2022 20:31:43'!
+usedForReport: aReport
+
+	^aReport useDepositFor: self.! !
 
 !Deposit methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:38'!
 value
@@ -1091,6 +1206,11 @@ transferAffectValue
 
 	^self value! !
 
+!TransferDepositLeg methodsFor: 'balance' stamp: 'PG 6/13/2022 20:32:02'!
+usedForReport: aReport
+
+	^aReport useTransferDepositLegFor: self.! !
+
 
 !classDefinition: #TransferWithdrawLeg category: 'ServiciosFinancieros-Solucion'!
 TransferLeg subclass: #TransferWithdrawLeg
@@ -1118,6 +1238,11 @@ asString
 transferAffectValue
 
 	^self value negated.! !
+
+!TransferWithdrawLeg methodsFor: 'balance' stamp: 'PG 6/13/2022 20:32:19'!
+usedForReport: aReport
+
+	^aReport useTransferWithdrawLegFor: self.! !
 
 
 !classDefinition: #Withdraw category: 'ServiciosFinancieros-Solucion'!
@@ -1151,6 +1276,11 @@ asString
 !Withdraw methodsFor: 'balance' stamp: 'PG 6/11/2022 19:53:27'!
 transferAffectValue
 	^0*peso.! !
+
+!Withdraw methodsFor: 'balance' stamp: 'PG 6/13/2022 20:32:33'!
+usedForReport: aReport
+
+	^aReport useWithdrawFor: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1264,41 +1394,5 @@ amount: anAmountOfMoney from: originAccount to: destinationAccount
 	
 	^transfer initializeWith: anAmountOfMoney withdrawLeg: withdrawLeg depositLeg: depositLeg
 	
-	
-	! !
-
-
-!classDefinition: #TransferNet category: 'ServiciosFinancieros-Solucion'!
-Object subclass: #TransferNet
-	instanceVariableNames: 'netForAccount'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'ServiciosFinancieros-Solucion'!
-
-!TransferNet methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 19:55:35'!
-initializeFor: anAccount
-
-	netForAccount := 0 * peso.
-	
-	anAccount transactions do: [ :aTransaction | 
-		netForAccount := netForAccount + aTransaction transferAffectValue.
-	].
-! !
-
-!TransferNet methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 19:02:07'!
-net
-
-	^netForAccount value.! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'TransferNet class' category: 'ServiciosFinancieros-Solucion'!
-TransferNet class
-	instanceVariableNames: ''!
-
-!TransferNet class methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 19:00:06'!
-for: anAccount
-
-	^self new initializeFor: anAccount.
 	
 	! !
