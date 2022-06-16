@@ -5,55 +5,51 @@ TestCase subclass: #AccountSummaryTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:26:07'!
-test01
-	"Summary para una cuenta sin balance"
+!AccountSummaryTest methodsFor: 'tests' stamp: 'PG 6/16/2022 17:07:33'!
+test01GenerateSummaryForAccountWithoutBalance	
 	
 	| account summary summaryReport |
 	
-	account := ReceptiveAccount  new.	
+	account := ReceptiveAccount new.	
 	summary := AccountSummary for: account.
 	
 	summaryReport := {'Balance = 0 * pesos'} asOrderedCollection.
-		
-	self assert: (summary report) equals: summaryReport.
+
+	self assert: (summary accountSummary) equals: summaryReport.
 	! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:26:45'!
-test02
-	"Summary para una cuenta con balance"
-	
-	| account summary summaryReport |
-	
-	account := ReceptiveAccount  new.
-	Deposit register: 100 * peso on: account.
-	
-	summaryReport := {'Balance = 100 * pesos'. 'Deposito por 100 * pesos'} asOrderedCollection.
-	
-	summary := AccountSummary for: account.	
-	
-	self assert: (summary report) equals: summaryReport.
-! !
-
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 18:18:14'!
-test03
-	"Summary para una cuenta con balance"
+!AccountSummaryTest methodsFor: 'tests' stamp: 'PG 6/16/2022 17:09:24'!
+test02GenerateSummaryForAccountWithBalanceModifiedFromDeposit	
 	
 	| account summary summaryReport |
 	
 	account := ReceptiveAccount new.
-	Withdraw register: 150 * peso on: account.
+	Deposit register: 100 * peso on: account.
 	
-	summaryReport := {'Balance = -150 * pesos'. 'Retiro por 150 * pesos'} asOrderedCollection.
+	summaryReport := {'Deposito por 100 * pesos'. 'Balance = 100 * pesos'} asOrderedCollection.
 	
 	summary := AccountSummary for: account.	
 	
-	self assert: summary report equals: summaryReport.
+	self assert: (summary accountSummary) equals: summaryReport.
 ! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 18:40:14'!
-test04
-	"Summary para una cuenta con balance"
+!AccountSummaryTest methodsFor: 'tests' stamp: 'PG 6/16/2022 17:10:55'!
+test03GenerateSummaryForAccountWithBalanceModifiedFromWithdraw	
+	
+	| account summary summaryReport |
+	
+	account := ReceptiveAccount new.	
+	Withdraw register: 150 * peso on: account.
+	
+	summaryReport := {'Retiro por 150 * pesos'. 'Balance = -150 * pesos'} asOrderedCollection.
+	
+	summary := AccountSummary for: account.	
+	
+	self assert: summary accountSummary equals: summaryReport.
+! !
+
+!AccountSummaryTest methodsFor: 'tests' stamp: 'PG 6/16/2022 17:17:55'!
+test04GenerateSummaryForAccountsWithBalanceModifiedFromATransfer	
 	
 	| originAccount destinationAccount summaryForOriginAccount summaryForDestinationAccount summaryReportForOriginAccount summaryReportForDestinationAccount |
 	
@@ -65,21 +61,20 @@ test04
 	
 	Transfer amount: 70 * peso from: originAccount to: destinationAccount.
 		
-	summaryReportForOriginAccount := {'Balance = 30 * pesos'. 'Deposito por 100 * pesos'. 'Salida por transferencia de 70 * pesos'} asOrderedCollection.
-	summaryReportForDestinationAccount := {'Balance = 270 * pesos'. 'Deposito por 200 * pesos'. 'Entrada por transferencia de 70 * pesos'} asOrderedCollection.
+	summaryReportForOriginAccount := {'Deposito por 100 * pesos'. 'Salida por transferencia de 70 * pesos'. 'Balance = 30 * pesos'} asOrderedCollection.
+	summaryReportForDestinationAccount := {'Deposito por 200 * pesos'. 'Entrada por transferencia de 70 * pesos'. 'Balance = 270 * pesos'} asOrderedCollection.
 	
 	summaryForOriginAccount := AccountSummary for: originAccount.	
 	summaryForDestinationAccount := AccountSummary for: destinationAccount.
 	
-	self assert: summaryForOriginAccount report equals: summaryReportForOriginAccount.
-	self assert: summaryForDestinationAccount report equals: summaryReportForDestinationAccount.
+	self assert: summaryForOriginAccount accountSummary equals: summaryReportForOriginAccount.
+	self assert: summaryForDestinationAccount accountSummary equals: summaryReportForDestinationAccount.
 	
 	
 ! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 18:46:13'!
-test05	
-	"Summary para una portfolio sin balance"
+!AccountSummaryTest methodsFor: 'tests' stamp: 'PG 6/16/2022 17:14:33'!
+test05GenerateSummaryForPortfolioWithoutBalance		
 	
 	| portfolio summary summaryReport |
 	
@@ -88,23 +83,24 @@ test05
 	
 	summaryReport := {'Balance = 0 * pesos'} asOrderedCollection.
 		
-	self assert: summary report equals: summaryReport.! !
+	self assert: summary accountSummary equals: summaryReport.! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 18:47:46'!
-test06
+!AccountSummaryTest methodsFor: 'tests' stamp: 'PG 6/16/2022 17:18:01'!
+test06GenerateSummaryForSimplePortfolio
+
 	| account portfolio summary summaryReport |
 	
 	account := ReceptiveAccount new.
 	Deposit register: 100 * peso on: account.
 	portfolio := Portfolio with: account.
 	
-	summaryReport := {'Balance = 100 * pesos'. 'Deposito por 100 * pesos'} asOrderedCollection.
+	summaryReport := {'Deposito por 100 * pesos'. 'Balance = 100 * pesos'} asOrderedCollection.
 	
 	summary := AccountSummary for: portfolio.		
-	self assert: summary report equals: summaryReport.	! !
+	self assert: summary accountSummary equals: summaryReport.	! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 19:45:57'!
-test07
+!AccountSummaryTest methodsFor: 'tests' stamp: 'PG 6/16/2022 17:16:55'!
+test07GenerateSummaryForComposedPortfolio
 
 	| simplePortfolioAccount simplePortfolio composedPortfolioAccount composedPortofolio summary summaryReport |
 	
@@ -116,10 +112,10 @@ test07
 	Withdraw register: 50 * peso on: composedPortfolioAccount.
 	composedPortofolio := Portfolio with: simplePortfolio with: composedPortfolioAccount.
 	
-	summaryReport := {'Balance = 50 * pesos'. 'Deposito por 100 * pesos'. 'Retiro por 50 * pesos'} asOrderedCollection.
+	summaryReport := {'Deposito por 100 * pesos'. 'Retiro por 50 * pesos'. 'Balance = 50 * pesos'} asOrderedCollection.
 	
 	summary := AccountSummary for: composedPortofolio.		
-	self assert: summary report equals: summaryReport.	
+	self assert: summary accountSummary equals: summaryReport.	
 	! !
 
 
@@ -435,22 +431,21 @@ TestCase subclass: #TransferNetTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 19:04:15'!
-test01
-	"TransferNet para una cuenta sin balance"
+
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'PG 6/16/2022 17:36:51'!
+test01GenerateTransferNetReportForAccountWithoutBalance	
 	
 	| account netForAccount |
 	
-	account := ReceptiveAccount  new.			
+	account := ReceptiveAccount new.			
 	netForAccount := TransferNet for: account.	
 			
-	self assert: netForAccount net equals: 0 * peso.
+	self assert: netForAccount transferNet equals: 0 * peso.
 	! !
 
-!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 19:04:11'!
-test02
-	"TransferNet para una cuenta sin balance"
-	
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'PG 6/16/2022 17:37:42'!
+test02DepositOnAnAccountDoesNotAffectTransferNetReport
+
 	| account netForAccount |
 	
 	account := ReceptiveAccount  new.	
@@ -458,50 +453,65 @@ test02
 	
 	netForAccount := TransferNet for: account.	
 			
-	self assert: netForAccount net equals: 0 * peso.
+	self assert: netForAccount transferNet equals: 0 * peso.
 	! !
 
-!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 19:10:34'!
-test03
-	"TransferNet para una cuenta sin balance"
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'PG 6/16/2022 17:21:45'!
+test03WithdrawDoesNotAffectTransferNetReport
+
+	| account netForAccount |
 	
-	| originAccount destinationAccount netForOriginAccount netForDestinationAccount |
+	account := ReceptiveAccount  new.	
+	Withdraw register: 150 * peso on: account.
+	
+	netForAccount := TransferNet for: account.	
+			
+	self assert: netForAccount transferNet equals: 0 * peso.
+	! !
+
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'PG 6/16/2022 17:34:49'!
+test04SendingATransferAffectsTransferNetReport
+
+	| originAccount destinationAccount netForOriginAccount |
 	
 	originAccount := ReceptiveAccount new.
-	Deposit register: 100 * peso on: originAccount.
+	destinationAccount := ReceptiveAccount new.			
 	
-	destinationAccount := ReceptiveAccount new.
-	Deposit register: 200 * peso on: destinationAccount.
-	
-	Transfer amount: 70 * peso from: originAccount to: destinationAccount.
-	Transfer amount: 50 * peso from: destinationAccount to: originAccount.
-	
-	netForOriginAccount := TransferNet for: originAccount.	
-	netForDestinationAccount := TransferNet for: destinationAccount.
-			
-	self assert: netForOriginAccount net equals: -20 * peso.
-	self assert: netForDestinationAccount net equals: 20 * peso.
-		
-	
+	Transfer amount: 70 * peso from: originAccount to: destinationAccount.		
+	netForOriginAccount := TransferNet for: originAccount.		
+
+	self assert: netForOriginAccount transferNet equals: -70 * peso.	
 ! !
 
-!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 19:16:50'!
-test04
-	"TransferNet para un portfolio sin balance"
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'PG 6/16/2022 17:36:08'!
+test05ReceivingATransferAffectsTransferNetReport
+
+	| originAccount destinationAccount netForDestinationAccount |
+	
+	originAccount := ReceptiveAccount new.
+	destinationAccount := ReceptiveAccount new.			
+	
+	Transfer amount: 70 * peso from: originAccount to: destinationAccount.		
+	netForDestinationAccount := TransferNet for: destinationAccount.
+				
+	self assert: netForDestinationAccount transferNet equals: 70 * peso.
+! !
+
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'PG 6/16/2022 17:36:59'!
+test06GenerateTransferNetReportForPortfolioWithoutBalance	
 	
 	| portfolio netForAccount |
 	
 	portfolio := Portfolio new.	
 	netForAccount := TransferNet for: portfolio.
 			
-	self assert: netForAccount net equals: 0 * peso.
+	self assert: netForAccount transferNet equals: 0 * peso.
 		
 	
 ! !
 
-!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 19:18:01'!
-test05
-	"TransferNet para un portfolio con balance por deposito"
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'PG 6/16/2022 17:37:35'!
+test07DepositOnAnAccountFromAPortfolioDoesNotAffectTransferNetReport	
 	
 	| account portfolio netForAccount |
 	
@@ -511,14 +521,13 @@ test05
 	
 	netForAccount := TransferNet for: portfolio.
 			
-	self assert: netForAccount net equals: 0 * peso.
+	self assert: netForAccount transferNet equals: 0 * peso.
 		
 	
 ! !
 
-!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 19:21:17'!
-test06
-	"TransferNet para un portfolio con balance por transferencia"
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'PG 6/16/2022 17:38:32'!
+test08SendingAndReceivingATransferAffectTransferNetReport	
 	
 	| originAccount destinationAccount originPortfolio destinationPortfolio netForOriginPortfolio netForDestinationPortfolio |
 	
@@ -536,15 +545,14 @@ test06
 	netForOriginPortfolio := TransferNet for: originPortfolio.
 	netForDestinationPortfolio := TransferNet for: destinationPortfolio.
 			
-	self assert: netForOriginPortfolio net equals: -30 * peso.
-	self assert: netForDestinationPortfolio net equals: 30 * peso.
+	self assert: netForOriginPortfolio transferNet equals: -30 * peso.
+	self assert: netForDestinationPortfolio transferNet equals: 30 * peso.
 		
 	
 ! !
 
-!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 19:29:10'!
-test07
-	"TransferNet para un portfolio compuesto con balance por transferencia"
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'PG 6/16/2022 17:39:19'!
+test09TransfersFromAccountsInsideAPortfolioResultInNeutralTransferNetForThePortfolio	
 	
 	| simplePortfolioAccount simplePortfolio composedPortfolioAccount composedPortofolio netForSimplePortfolio netForComposedPortfolio |
 	
@@ -562,8 +570,8 @@ test07
 	netForSimplePortfolio := TransferNet for: simplePortfolio.
 	netForComposedPortfolio := TransferNet for: composedPortofolio.
 	
-	self assert: netForSimplePortfolio net equals: -30 * peso.	
-	self assert: netForComposedPortfolio net equals: 0 * peso.
+	self assert: netForSimplePortfolio transferNet equals: -30 * peso.	
+	self assert: netForComposedPortfolio transferNet equals: 0 * peso.
 	
 	
 	! !
@@ -912,23 +920,23 @@ Object subclass: #AccountReport
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!AccountReport methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:49:19'!
+!AccountReport methodsFor: 'visitors' stamp: 'PG 6/13/2022 20:49:19'!
 useDepositFor: aTransaction
 
 	self subclassResponsibility.
 ! !
 
-!AccountReport methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:49:59'!
+!AccountReport methodsFor: 'visitors' stamp: 'PG 6/13/2022 20:49:59'!
 useTransferDepositLegFor: aTransaction
 
 	self subclassResponsibility.! !
 
-!AccountReport methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:50:19'!
+!AccountReport methodsFor: 'visitors' stamp: 'PG 6/13/2022 20:50:19'!
 useTransferWithdrawLegFor: aTransaction
 
 	self subclassResponsibility.! !
 
-!AccountReport methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:50:37'!
+!AccountReport methodsFor: 'visitors' stamp: 'PG 6/13/2022 20:50:37'!
 useWithdrawFor: aTransaction
 
 	self subclassResponsibility.! !
@@ -941,36 +949,52 @@ AccountReport subclass: #AccountSummary
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!AccountSummary methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:28:21'!
-initializeFor: anAccount
-
-	accountSummary := OrderedCollection new.
-	
-	accountSummary add: 'Balance = ', (anAccount balance)asString.
-	anAccount transactions do: [ :aTransaction | accountSummary add: (aTransaction usedForReport: self)].
-	! !
-
-!AccountSummary methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 17:56:45'!
-report
+!AccountSummary methodsFor: 'main protocol' stamp: 'PG 6/16/2022 16:28:35'!
+accountSummary
 
 	^accountSummary.! !
 
-!AccountSummary methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:31:43'!
+
+!AccountSummary methodsFor: 'private' stamp: 'PG 6/16/2022 16:56:50'!
+addToSummary: aTransaction
+
+	accountSummary add: (aTransaction usedForReport: self).	! !
+
+!AccountSummary methodsFor: 'private' stamp: 'PG 6/16/2022 16:58:20'!
+generateSummaryFor: anAccount
+
+	anAccount transactions do: [ :aTransaction | 
+		self addToSummary: aTransaction.
+	].
+
+	accountSummary add: 'Balance = ', (anAccount balance)asString.
+! !
+
+
+!AccountSummary methodsFor: 'initialization' stamp: 'PG 6/16/2022 16:58:12'!
+initializeFor: anAccount
+
+	accountSummary := OrderedCollection new.
+	self generateSummaryFor: anAccount.
+! !
+
+
+!AccountSummary methodsFor: 'visitors' stamp: 'PG 6/13/2022 20:31:43'!
 useDepositFor: aTransaction
 
 	^'Deposito por ', (aTransaction value)asString.! !
 
-!AccountSummary methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:32:02'!
+!AccountSummary methodsFor: 'visitors' stamp: 'PG 6/13/2022 20:32:02'!
 useTransferDepositLegFor: aTransaction
 
 	^'Entrada por transferencia de ', (aTransaction value)asString.! !
 
-!AccountSummary methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:32:19'!
+!AccountSummary methodsFor: 'visitors' stamp: 'PG 6/13/2022 20:32:19'!
 useTransferWithdrawLegFor: aTransaction
 
 	^'Salida por transferencia de ', (aTransaction value)asString.! !
 
-!AccountSummary methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:32:33'!
+!AccountSummary methodsFor: 'visitors' stamp: 'PG 6/13/2022 20:32:33'!
 useWithdrawFor: aTransaction
 
 	^'Retiro por ', (aTransaction value)asString.! !
@@ -981,14 +1005,10 @@ useWithdrawFor: aTransaction
 AccountSummary class
 	instanceVariableNames: ''!
 
-!AccountSummary class methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 17:39:45'!
+!AccountSummary class methodsFor: 'instance creation' stamp: 'PG 6/16/2022 17:52:14'!
 for: anAccount
 
-	| summary |
-	
-	summary := self new.
-	
-	^summary initializeFor: anAccount.! !
+	^self new initializeFor: anAccount.! !
 
 
 !classDefinition: #TransferNet category: 'ServiciosFinancieros-Solucion'!
@@ -998,40 +1018,54 @@ AccountReport subclass: #TransferNet
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!TransferNet methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:56:30'!
-initializeFor: anAccount
-
-	netForAccount := 0 * peso.
-	
-	anAccount transactions do: [ :aTransaction | 
-		netForAccount := netForAccount + (aTransaction usedForReport: self).
-	].
-! !
-
-!TransferNet methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 19:02:07'!
-net
-
-	^netForAccount value.! !
-
-!TransferNet methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:55:47'!
+!TransferNet methodsFor: 'visitors' stamp: 'PG 6/16/2022 16:50:32'!
 useDepositFor: aTransaction
 
-	^0*peso.! !
+	^0 * peso.! !
 
-!TransferNet methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:42:38'!
+!TransferNet methodsFor: 'visitors' stamp: 'PG 6/16/2022 17:32:24'!
 useTransferDepositLegFor: aTransaction
 
 	^aTransaction value.! !
 
-!TransferNet methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:42:47'!
+!TransferNet methodsFor: 'visitors' stamp: 'PG 6/16/2022 17:32:28'!
 useTransferWithdrawLegFor: aTransaction
 
 	^aTransaction value negated.! !
 
-!TransferNet methodsFor: 'as yet unclassified' stamp: 'PG 6/13/2022 20:44:52'!
+!TransferNet methodsFor: 'visitors' stamp: 'PG 6/13/2022 20:44:52'!
 useWithdrawFor: aTransaction
 
 	^0 * peso.! !
+
+
+!TransferNet methodsFor: 'main protocol' stamp: 'PG 6/16/2022 16:28:17'!
+transferNet
+
+	^netForAccount value.! !
+
+
+!TransferNet methodsFor: 'initialization' stamp: 'PG 6/16/2022 16:58:55'!
+initializeFor: anAccount
+
+	netForAccount := 0 * peso.	
+	self generateReportFor: anAccount.
+! !
+
+
+!TransferNet methodsFor: 'private' stamp: 'PG 6/16/2022 16:53:11'!
+calculateTransferNetFor: aTransaction
+
+	netForAccount := netForAccount + (aTransaction usedForReport: self).
+! !
+
+!TransferNet methodsFor: 'private' stamp: 'PG 6/16/2022 16:58:40'!
+generateReportFor: anAccount
+	
+	anAccount transactions do: [ :aTransaction | 
+		self calculateTransferNetFor: aTransaction.		
+	].
+! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1039,7 +1073,7 @@ useWithdrawFor: aTransaction
 TransferNet class
 	instanceVariableNames: ''!
 
-!TransferNet class methodsFor: 'as yet unclassified' stamp: 'PG 6/11/2022 19:00:06'!
+!TransferNet class methodsFor: 'instance creation' stamp: 'PG 6/11/2022 19:00:06'!
 for: anAccount
 
 	^self new initializeFor: anAccount.
@@ -1059,15 +1093,16 @@ asString
 
 	self subclassResponsibility ! !
 
-!AccountTransaction methodsFor: 'value' stamp: 'PG 6/13/2022 20:28:21'!
-usedForReport: aReport
-
-	self subclassResponsibility.! !
-
 !AccountTransaction methodsFor: 'value' stamp: 'HernanWilkinson 9/12/2011 12:25'!
 value 
 
 	self subclassResponsibility ! !
+
+
+!AccountTransaction methodsFor: 'report' stamp: 'PG 6/13/2022 20:28:21'!
+usedForReport: aReport
+
+	self subclassResponsibility.! !
 
 
 !AccountTransaction methodsFor: 'balance' stamp: 'HAW 5/25/2019 11:25:39'!
@@ -1094,10 +1129,11 @@ initializeFor: aValue
 	value := aValue ! !
 
 
-!Deposit methodsFor: 'value' stamp: 'PG 6/13/2022 20:31:43'!
+!Deposit methodsFor: 'report' stamp: 'PG 6/16/2022 16:47:47'!
 usedForReport: aReport
 
 	^aReport useDepositFor: self.! !
+
 
 !Deposit methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:38'!
 value
@@ -1114,12 +1150,6 @@ affectBalance: aBalance
 transferAffectValue
 
 	^0*peso.! !
-
-
-!Deposit methodsFor: 'nnnn' stamp: 'PG 6/11/2022 19:34:55'!
-asString
-
-	^'Deposito por ', (self value)asString.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1186,6 +1216,12 @@ TransferLeg subclass: #TransferDepositLeg
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
+!TransferDepositLeg methodsFor: 'report' stamp: 'PG 6/13/2022 20:32:02'!
+usedForReport: aReport
+
+	^aReport useTransferDepositLegFor: self.! !
+
+
 !TransferDepositLeg methodsFor: 'accessing' stamp: 'LL 9/20/2020 22:26:10'!
 withdrawLeg
 
@@ -1197,19 +1233,10 @@ affectBalance: aBalance
 
 	^aBalance + self value! !
 
-!TransferDepositLeg methodsFor: 'balance' stamp: 'PG 6/11/2022 19:36:48'!
-asString
-	^'Entrada por transferencia de ', (self value)asString.! !
-
 !TransferDepositLeg methodsFor: 'balance' stamp: 'PG 6/11/2022 19:54:33'!
 transferAffectValue
 
 	^self value! !
-
-!TransferDepositLeg methodsFor: 'balance' stamp: 'PG 6/13/2022 20:32:02'!
-usedForReport: aReport
-
-	^aReport useTransferDepositLegFor: self.! !
 
 
 !classDefinition: #TransferWithdrawLeg category: 'ServiciosFinancieros-Solucion'!
@@ -1218,6 +1245,12 @@ TransferLeg subclass: #TransferWithdrawLeg
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
+
+!TransferWithdrawLeg methodsFor: 'report' stamp: 'PG 6/13/2022 20:32:19'!
+usedForReport: aReport
+
+	^aReport useTransferWithdrawLegFor: self.! !
+
 
 !TransferWithdrawLeg methodsFor: 'accessing' stamp: 'LL 9/20/2020 22:25:47'!
 depositLeg
@@ -1230,19 +1263,10 @@ affectBalance: aBalance
 
 	^aBalance - self value! !
 
-!TransferWithdrawLeg methodsFor: 'balance' stamp: 'PG 6/11/2022 19:37:06'!
-asString
-	^'Salida por transferencia de ', (self value)asString.! !
-
 !TransferWithdrawLeg methodsFor: 'balance' stamp: 'PG 6/11/2022 19:54:38'!
 transferAffectValue
 
 	^self value negated.! !
-
-!TransferWithdrawLeg methodsFor: 'balance' stamp: 'PG 6/13/2022 20:32:19'!
-usedForReport: aReport
-
-	^aReport useTransferWithdrawLegFor: self.! !
 
 
 !classDefinition: #Withdraw category: 'ServiciosFinancieros-Solucion'!
@@ -1258,6 +1282,12 @@ initializeFor: aValue
 	value := aValue ! !
 
 
+!Withdraw methodsFor: 'report' stamp: 'PG 6/13/2022 20:32:33'!
+usedForReport: aReport
+
+	^aReport useWithdrawFor: self.! !
+
+
 !Withdraw methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:33'!
 value
 
@@ -1269,18 +1299,9 @@ affectBalance: aBalance
 
 	^aBalance - value! !
 
-!Withdraw methodsFor: 'balance' stamp: 'PG 6/11/2022 19:36:23'!
-asString
-	^'Retiro por ', (self value)asString.! !
-
 !Withdraw methodsFor: 'balance' stamp: 'PG 6/11/2022 19:53:27'!
 transferAffectValue
 	^0*peso.! !
-
-!Withdraw methodsFor: 'balance' stamp: 'PG 6/13/2022 20:32:33'!
-usedForReport: aReport
-
-	^aReport useWithdrawFor: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
